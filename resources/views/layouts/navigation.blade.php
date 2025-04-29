@@ -11,11 +11,37 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="flex space-x-8 sm:ms-10">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('MARKETPLACE_VALLENAR') }}
+                        {{ __('MARKETPLACE VALLENAR') }}
                     </x-nav-link>
                 </div>
+
+                <!-- 2) Panel de admin: solo si el usuario tiene el rol 'admin' -->
+                @role('admin|seller')
+                <div class="flex space-x-8 sm:ms-10">
+                    <x-nav-link
+                        :href="route('admin.index')"
+                        :active="request()->routeIs('admin.index')">
+                        {{ __('Panel de Vendedor') }}
+                    </x-nav-link>
+                </div>
+                @endrole
+
+                <!-- 3) Enlace de prueba siempre visible -->
+                @php
+                $user = auth()->user();
+                $sellerId = $user->id; // o un ID fijo si quieres mostrar productos de un vendedor específico
+                @endphp
+
+                @if ($user->hasRole('buyer'))
+                <div class="flex space-x-8 sm:ms-10">
+                    <x-nav-link :href="route('buyer.products.by_user', ['userId' => $sellerId])"
+                        :active="request()->routeIs('buyer.products.by_user')">
+                        {{ __('Ver Productos') }}
+                    </x-nav-link>
+                </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->
@@ -24,9 +50,9 @@
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                             @auth
-                                <div class="font-medium text-base text-gray-800 dark:text-gray-200">
-                                    {{ Auth::user()->name }}
-                                </div>
+                            <div class="font-medium text-base text-gray-800 dark:text-gray-200">
+                                {{ Auth::user()->name }}
+                            </div>
                             @endauth
 
                             <div class="ms-1">
@@ -47,7 +73,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -81,16 +107,16 @@
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">
                     @auth
-                        <div class="font-medium text-base text-gray-800 dark:text-gray-200">
-                            {{ Auth::user()->name }}
-                        </div>
+                    <div class="font-medium text-base text-gray-800 dark:text-gray-200">
+                        {{ Auth::user()->name }}
+                    </div>
                     @endauth
-            </div>
+                </div>
                 <div class="font-medium text-sm text-gray-500">
                     @if(Auth::check())
-                        <div class="font-medium text-sm text-gray-500">
-                            {{ Auth::user()->email }}
-                        </div>
+                    <div class="font-medium text-sm text-gray-500">
+                        {{ Auth::user()->email }}
+                    </div>
                     @endif
                 </div>
             </div>
@@ -105,7 +131,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

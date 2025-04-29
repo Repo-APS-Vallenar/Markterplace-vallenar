@@ -1,32 +1,31 @@
-<div id="createProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
-        <!-- contenido del formulario -->
-        <h2 class="text-xl font-bold mb-4">Crear nuevo producto</h2>
+<div id="createModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden w-full max-w-lg mx-4">
+        <div class="px-4 py-2 bg-gray-100 border-b flex justify-between items-center">
+            <h3 class="text-lg font-semibold">Crear Nuevo Producto</h3>
+            <button id="closeCreateModal" type="button" class="text-gray-600 hover:text-gray-800">&times;</button>
+        </div>
         <form method="POST" action="{{ route('seller.products.store') }}">
+            {{-- CSRF Token --}}
             @csrf
-            <!-- Nombre -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Nombre</label>
-                <input type="text" name="name" required
-                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="px-4 py-4">
+                <div class="mb-4">
+                    <label for="createName" class="block text-sm font-medium text-gray-700">Nombre</label>
+                    <input type="text" name="name" id="createName" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="createPrice" class="block text-sm font-medium text-gray-700">Precio</label>
+                    <input type="number" name="price" id="createPrice" step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                </div>
+                <div class="mb-4">
+                    <label for="createDescription" class="block text-sm font-medium text-gray-700">Descripción</label>
+                    <textarea name="description" id="createDescription" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required></textarea>
+                </div>
             </div>
-            <!-- Precio -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Precio</label>
-                <input type="number" name="price" step="0.01" required
-                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="px-4 py-3 bg-gray-100 text-right">
+                <button type="button" id="cancelCreateModal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancelar</button>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Guardar</button>
             </div>
-            <!-- Descripción -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Descripción</label>
-                <textarea name="description"
-                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-            </div>
-            <!-- Botones -->
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded-md">Cancelar</button>
-                <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md">Guardar</button>
-            </div>
+
         </form>
     </div>
 </div>

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\Role;
+use Illuminate\Support\Facades\Log;
 
 class RegisteredUserController extends Controller
 {
@@ -19,7 +21,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        // Obtener roles 'buyer' y 'seller'
+        $roles = Role::whereIn('name', ['buyer', 'seller'])->get();
+        return view('auth.register', compact('roles'));
     }
 
     /**
@@ -29,22 +33,32 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Validar los campos del formulario
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'in:buyer,seller'], // Validación para el rol
         ]);
 
+        // Crear el nuevo usuario
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
+        // Asignar el rol al usuario
+        Log::debug('Role asignado:', [$request->role]);
+        $user->assignRole($request->role);
+
+        // Disparar el evento de registro
         event(new Registered($user));
 
+        // Loguear al usuario
         Auth::login($user);
 
+        // Redirigir al dashboard o página correspondiente
         return redirect(route('dashboard', absolute: false));
     }
 }

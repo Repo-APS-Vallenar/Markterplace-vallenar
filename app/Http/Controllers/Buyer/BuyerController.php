@@ -7,6 +7,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class BuyerController extends Controller
 {
@@ -57,6 +58,16 @@ class BuyerController extends Controller
     {
         $orders = Order::where('user_id', Auth::id())->get();
         return view('buyer.orders.index', compact('orders'));
+    }
+
+    public function sellersWithProducts()
+    {
+        $sellers = User::where('role', 'seller')
+            ->with(['products' => function ($query) {
+                $query->where('is_active', true);
+            }])->get();
+
+        return view('buyer.sellers', compact('sellers'));
     }
 
     // Ver detalles de un pedido específico

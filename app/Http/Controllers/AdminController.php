@@ -10,22 +10,19 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
 
+
     public function index()
     {
         $user = Auth::user();
-
-        return view("/admin/index", compact("user"));
+        return view('admin.index', compact('user'));  // <-- usar notación con punto
     }
     // Constructor para asegurar que solo los admin puedan acceder
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            // Verificar si el usuario tiene el rol 'admin'
-            if (Auth::check() && !Auth::user()->hasRole('admin')) {
-                // Si no tiene el rol, regresar un error 403
-                return abort(403, 'Unauthorized');
+            if (Auth::check() && ! Auth::user()->hasRole('admin')) {
+                abort(403, 'Unauthorized');
             }
-
             return $next($request);
         });
     }

@@ -16,15 +16,15 @@ class User extends Authenticatable
     use HasRoles;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-    
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
 
-    
-     protected $fillable = [
+
+    protected $fillable = [
         'name',
         'email',
         'password',
@@ -54,28 +54,20 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
-
-    public function isSeller()
-    {
-        return $this->role === 'seller';
-    }
-
-    public function isBuyer()
-    {
-        return $this->role === 'buyer';
-    }
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'user_id');  // Aquí se debe utilizar 'user_id'
     }
 
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
+
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+
 }

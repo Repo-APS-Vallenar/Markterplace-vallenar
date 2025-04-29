@@ -9,17 +9,6 @@ use App\Http\Controllers\Controller;
 
 class SellerController extends Controller
 {
-    public function __construct()
-    {
-        // Verifica que el usuario tenga el rol de 'seller' antes de continuar
-        $this->middleware(function ($request, $next) {
-            if (Auth::check() && !Auth::user()->hasRole('seller')) {
-                return abort(403, 'Unauthorized');
-            }
-
-            return $next($request);
-        });
-    }
 
     // Mostrar todos los productos del vendedor
     public function index()

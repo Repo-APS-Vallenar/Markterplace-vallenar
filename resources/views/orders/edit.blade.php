@@ -1,39 +1,54 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Editar Pedido</h1>
-    <form action="{{ route('orders.update', $order->id) }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div class="mb-3">
-            <label for="product_id" class="form-label">Producto</label>
-            <select class="form-control" id="product_id" name="product_id" required>
-                @foreach ($products as $product)
-                    <option value="{{ $product->id }}" {{ $product->id == $order->product_id ? 'selected' : '' }}>{{ $product->name }}</option>
-                @endforeach
+<div class="container mx-auto px-4 py-8 max-w-md">
+    <h1 class="text-2xl font-bold mb-6">Editar Pedido #{{ $order->id }}</h1>
+
+    <form action="{{ route('orders.update', $order) }}" method="POST"
+        class="bg-white shadow-md rounded p-6 space-y-4">
+        @csrf @method('PUT')
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+            <input type="number" name="quantity" min="1"
+                value="{{ $order->quantity }}" required
+                class="mt-1 block w-full border-gray-300 rounded p-2">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Método de entrega</label>
+            <select name="delivery_method" required
+                class="mt-1 block w-full border-gray-300 rounded p-2">
+                <option value="domicilio"
+                    {{ $order->delivery_method==='domicilio'? 'selected':'' }}>
+                    En domicilio del vendedor
+                </option>
+                <option value="acordar"
+                    {{ $order->delivery_method==='acordar'? 'selected':'' }}>
+                    A acordar con el vendedor
+                </option>
             </select>
         </div>
-        <div class="mb-3">
-            <label for="user_id" class="form-label">Usuario</label>
-            <select class="form-control" id="user_id" name="user_id" required>
-                @foreach ($users as $user)
-                    <option value="{{ $user->id }}" {{ $user->id == $order->user_id ? 'selected' : '' }}>{{ $user->name }}</option>
-                @endforeach
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Estado</label>
+            <select name="status" required
+                class="mt-1 block w-full border-gray-300 rounded p-2">
+                <option value="pending" {{ $order->status==='pending'?    'selected':'' }}>Pendiente</option>
+                <option value="processing" {{ $order->status==='processing'? 'selected':'' }}>En proceso</option>
+                <option value="completed" {{ $order->status==='completed'?  'selected':'' }}>Completado</option>
+                <option value="cancelled" {{ $order->status==='cancelled'?  'selected':'' }}>Cancelado</option>
             </select>
         </div>
-        <div class="mb-3">
-            <label for="quantity" class="form-label">Cantidad</label>
-            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ $order->quantity }}" required>
-        </div>
-        <div class="mb-3">
-            <label for="status" class="form-label">Estado</label>
-            <select class="form-control" id="status" name="status" required>
-                <option value="pendiente" {{ $order->status == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                <option value="completado" {{ $order->status == 'completado' ? 'selected' : '' }}>Completado</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-warning">Actualizar Pedido</button>
+
+        <button type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Guardar cambios
+        </button>
+        <a href="{{ route('orders.index') }}"
+            class="ml-4 text-gray-600 hover:underline">
+            Cancelar
+        </a>
     </form>
 </div>
 @endsection

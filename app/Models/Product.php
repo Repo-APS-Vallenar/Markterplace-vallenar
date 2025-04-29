@@ -31,4 +31,9 @@ class Product extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
 }

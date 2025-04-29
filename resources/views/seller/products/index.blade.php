@@ -1,136 +1,126 @@
+<!-- resources/views/seller/products/index.blade.php -->
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto p-6">
-        <!-- Mensaje de éxito -->
-        @if (session('success'))
-            <div x-data="{ show: true }" x-show="show"
-                class="alert alert-success bg-green-500 text-white p-4 rounded-md mb-4 flex justify-between items-center">
-                <span>{{ session('success') }}</span>
-                <button @click="show = false" class="text-white font-bold text-lg">&times;</button>
-            </div>
-        @endif
-
-        <!-- Botón para crear producto -->
-        <button id="createProductModalButton" onclick="openModal()" class="px-4 py-2 bg-green-500 text-white rounded-md">
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-4">Lista de Productos</h1>
+    @if(session('success'))
+    <div class="alert-success mb-4 p-4 rounded border border-green-400 bg-green-100 text-green-800 flex justify-between items-center">
+        <div>
+            <strong>¡Éxito!</strong> {{ session('success') }}
+        </div>
+        <button onclick="this.parentElement.remove()"
+            class="text-green-700 hover:text-green-900">
+            &times;
+        </button>
+    </div>
+    @endif
+    <!-- Botón Crear Producto -->
+    <div class="mb-4">
+        <button id="createButton"
+            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
             Nuevo Producto
         </button>
-
-        <!-- Modal de creación de producto -->
-        @include('seller.products.modals.create-modal')
-
-        <!-- Tabla de productos -->
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table class="table-auto w-full text-left">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-4 py-2 text-sm font-medium text-gray-700">Nombre</th>
-                        <th class="px-4 py-2 text-sm font-medium text-gray-700">Precio</th>
-                        <th class="px-4 py-2 text-sm font-medium text-gray-700">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($products as $product)
-                        <tr class="border-b">
-                            <td class="px-4 py-2 text-sm text-gray-700">{{ $product->name }}</td>
-                            <td class="px-4 py-2 text-sm text-gray-700">${{ number_format($product->price) }}</td>
-                            <td class="px-4 py-2 text-sm">
-                                <!-- Botón de edición -->
-                                <button id="editProductModalButton" onclick="openModalEdit()"
-                                    class="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
-                                    data-bs-toggle="editProductModal" data-bs-target="#editProductModal">
-                                    Editar
-                                </button>
-
-                                <!-- Botón de ver detalles -->
-                                <button id="showProductModalButton" onclick="openModalShow()"
-                                    class="bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600"
-                                    data-bs-toggle="showProductModal" data-bs-target="#showProductModal">
-                                    Ver
-                                </button>
-
-                                <!-- Modal de edición -->
-                                @include('seller.products.modals.edit-modal', ['product' => $product])
-
-                                <!-- Modal de visualización -->
-                                @include('seller.products.modals.show-modal', ['product' => $product])
-
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="text-center px-4 py-2 text-sm text-gray-700">No hay productos disponibles
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
     </div>
+
+    <div class="overflow-x-auto bg-white shadow-md rounded">
+        <table class="min-w-full">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-left text-gray-600">Nombre</th>
+                    <th class="px-4 py-2 text-left text-gray-600">Precio</th>
+                    <th class="px-4 py-2 text-left text-gray-600">Descripción</th>
+                    <th class="px-4 py-2 text-center text-gray-600">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($products as $product)
+                <tr class="border-t hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ $product->name }}</td>
+                    <td class="px-4 py-2">{{ number_format($product->price, 2) }}</td>
+                    <td class="px-4 py-2">{{ $product->description }}</td>
+                    <td class="px-4 py-2 text-center space-x-2">
+                        <button type="button"
+                            class="edit-button bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                            data-product='@json($product)'>
+                            Editar
+                        </button>
+                        <button type="button"
+                            class="show-button bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded"
+                            data-product='@json($product)'>
+                            Ver
+                        </button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Modales Dinámicos --}}
+    @include('seller.products.modals.create-modal')
+    @include('seller.products.modals.edit-modal')
+    @include('seller.products.modals.show-modal')
+</div>
 @endsection
 
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- CREATE MODAL ---
+        const createModal = document.getElementById('createModal');
+        const openCreateBtn = document.getElementById('createButton');
+        const closeCreateBtn = document.getElementById('closeCreateModal');
+        const cancelCreateBtn = document.getElementById('cancelCreateModal');
 
-    <script>
-        // Función para abrir el modal de creación
-        function openModal() {
-            var modal = document.getElementById('createProductModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            } else {
-                console.error("No se encontró el modal con el ID 'createProductModal'.");
-            }
-        }
-        function openModalEdit() {
-            var modal = document.getElementById('editProductModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            } else {
-                console.error("No se encontró el modal con el ID 'editProductModal'.");
-            }
-        }
-        function openModalShow() {
-            var modal = document.getElementById('showProductModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            } else {
-                console.error("No se encontró el modal con el ID 'showProductModal'.");
-            }
-        }
+        openCreateBtn.onclick = () => createModal.classList.remove('hidden');
+        closeCreateBtn.onclick = () => createModal.classList.add('hidden');
+        cancelCreateBtn.onclick = () => createModal.classList.add('hidden');
 
-        // Función para cerrar modal createProductModal
-        function closeModal(productId = null) {
-            var modal;
-            modal = document.getElementById('createProductModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        }
-        // Función para cerrar modal editProductModal
-        function closeModalEdit(productId = null) {
-            var modal;
-            modal = document.getElementById('editProductModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        }
-        // Función para cerrar modal showProductModal
-        function closeModalShow(productId = null) {
-            var modal;
-            modal = document.getElementById('showProductModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-        }
+        // --- EDIT MODAL ---
+        const editModal = document.getElementById('editModal');
+        document.querySelectorAll('.edit-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const p = JSON.parse(btn.getAttribute('data-product'));
+                const modal = editModal;
+                const nameInput = modal.querySelector('#editName');
+                const priceInput = modal.querySelector('#editPrice');
+                const descInput = modal.querySelector('#editDescription');
+                const form = modal.querySelector('#editProductForm');
 
-        // Inicializar modales de Bootstrap
-        document.addEventListener('DOMContentLoaded', function () {
-            var modals = document.querySelectorAll('.modal');
-            modals.forEach(function (modal) {
-                new bootstrap.Modal(modal);  // Esto inicializa el modal si no se ha hecho
+                nameInput.value = p.name;
+                priceInput.value = p.price;
+                descInput.value = p.description;
+                form.action = `${window.location.origin}/seller/products/${p.id}`;
+                modal.classList.remove('hidden');
             });
         });
+        document.getElementById('closeModal').onclick = () => editModal.classList.add('hidden');
+        document.getElementById('cancelModal').onclick = () => editModal.classList.add('hidden');
 
-    </script>
+        // --- SHOW MODAL ---
+        const showModal = document.getElementById('showModal');
+        document.querySelectorAll('.show-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const p = JSON.parse(btn.getAttribute('data-product'));
+                showModal.querySelector('#showName').textContent = p.name;
+                showModal.querySelector('#showPrice').textContent = p.price;
+                showModal.querySelector('#showDescription').textContent = p.description;
+                showModal.classList.remove('hidden');
+            });
+        });
+        document.getElementById('closeShowModal').onclick = () => showModal.classList.add('hidden');
+        document.getElementById('cancelShowModal').onclick = () => showModal.classList.add('hidden');
+    });
 
+    if (document.querySelector('.alert-success')) {
+        setTimeout(() => {
+            document.querySelector('.alert-success').remove();
+        }, 5000);
+    }
+</script>
+<script>
+    // Base URL para los productos del seller
+    const sellerProductsBaseUrl = "{{ url('seller/products') }}";
+</script>
 @endsection

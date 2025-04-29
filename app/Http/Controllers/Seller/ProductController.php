@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Seller;
 
-use App\Models\Product;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
-    // Mostrar todos los productos del vendedor autenticado
+
     public function index()
     {
-
-        $products = Product::all();
+        $products = Product::where('user_id', Auth::id())->get();
         return view('seller.products.index', compact('products'));
     }
 
@@ -25,42 +25,30 @@ class ProductController extends Controller
     // Guardar un nuevo producto
     public function store(Request $request)
     {
-        // Verificar si el usuario está autenticado
-        $user = Auth::user();
-        if (!$user) {
-            // El usuario no está autenticado, redirigir o mostrar un mensaje de error
-            return redirect()->route('login')->with('error', 'Necesitas estar logueado.');
-        }
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'price' => 'required|numeric',
+        ]);
 
-        // El usuario está autenticado, ahora puedes proceder
+        // Crear el producto y asociarlo con el vendedor
         $product = new Product();
         $product->name = $request->name;
-        $product->price = $request->price;
         $product->description = $request->description;
-        $product->user_id = Auth::user()->id; // Accede al id del usuario autenticado
+        $product->price = $request->price;
+        $product->seller_id = Auth::id(); // Usar el ID del vendedor autenticado
         $product->save();
 
-        return redirect()->route('seller.products.index')->with('success', 'Producto creado exitosamente.');
+        return redirect()->route('buyer.products.by_user', ['userId' => Auth::id()]);
     }
 
-
-
-    // Mostrar un producto específico
-    public function show(Product $product)
-    {
-        $products = Product::all();
-        return view('seller.products.modals.show-modal', compact('product'));
-    }
-
-    // Mostrar el formulario para editar un producto
     public function edit(Product $product)
     {
-        $products = Product::all();
         if ($product->user_id !== Auth::id()) {
-            return redirect()->route('seller.products.index');
+            return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        return view('seller.products.modals.edit-modal', compact('product'));
+        return response()->json($product);
     }
 
     // Actualizar un producto
@@ -93,5 +81,10 @@ class ProductController extends Controller
 
         $product->delete();
         return redirect()->route('seller.products.index');
+    }
+
+    public function show(Product $product)
+    {
+        return response()->json($product);
     }
 }

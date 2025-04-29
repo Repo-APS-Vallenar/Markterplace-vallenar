@@ -11,41 +11,53 @@
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
                 <input id="name" name="name" type="text" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                       value="{{ old('name') }}">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value="{{ old('name') }}">
                 @error('name')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
                 <input id="email" name="email" type="email" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                       value="{{ old('email') }}">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    value="{{ old('email') }}">
                 @error('email')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
                 <input id="password" name="password" type="password" required autocomplete="new-password"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 @error('password')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
                 <input id="password_confirmation" name="password_confirmation" type="password" required
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            </div>
+
+            <!-- Campo para seleccionar el rol desde la tabla roles -->
+            <div>
+                <label for="role_id" class="block text-sm font-medium text-gray-700">Tipo de usuario</label>
+                <select id="role" name="role" class="form-select block w-full">
+                    <option value="buyer">Comprador</option>
+                    <option value="seller">Vendedor</option>
+                </select>
+                @error('role_id')
+                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
                 <button type="submit"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
                     Registrarse
                 </button>
             </div>
