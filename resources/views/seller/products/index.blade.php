@@ -1,8 +1,7 @@
 <!-- resources/views/seller/products/index.blade.php -->
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('content')
-<div class="container mx-auto px-4 py-8">
+@section('admin-content')
     <h1 class="text-2xl font-bold mb-4">Lista de Productos</h1>
     @if(session('success'))
     <div class="alert-success mb-4 p-4 rounded border border-green-400 bg-green-100 text-green-800 flex justify-between items-center">
@@ -61,7 +60,6 @@
     @include('seller.products.modals.create-modal')
     @include('seller.products.modals.edit-modal')
     @include('seller.products.modals.show-modal')
-</div>
 @endsection
 
 @section('scripts')

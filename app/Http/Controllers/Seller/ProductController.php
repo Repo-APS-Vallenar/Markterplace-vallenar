@@ -33,6 +33,7 @@ class ProductController extends Controller
             'name' => 'required',
             'description' => 'required',
             'price' => 'required|numeric',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         // Crear el producto y asociarlo con el vendedor
@@ -41,6 +42,7 @@ class ProductController extends Controller
         $product->description = $request->description;
         $product->price = $request->price;
         $product->seller_id = Auth::id(); // Usar el ID del vendedor autenticado
+        $product->category_id = $request->category_id;
         $product->save();
 
         return redirect()->route('buyer.products.by_user', ['userId' => Auth::id()]);
@@ -64,12 +66,14 @@ class ProductController extends Controller
             'name' => 'required|string',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $product->update([
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
+            'category_id' => $request->category_id,
         ]);
 
         return redirect()->route('seller.products.index')->with('success', 'Producto actualizado correctamente.');

@@ -17,10 +17,21 @@ class OrderController extends Controller
         $orders = Order::with(['product', 'user'])->latest()->get();
 
         $orders = $orders->filter(function ($order) {
-            return Gate::allows('view', $order);
+            return \Gate::allows('view', $order);
+        })->values();
+
+        $ordersForJson = $orders->map(function($order) {
+            return [
+                'id' => $order->id,
+                'product' => optional($order->product)->name ?? '',
+                'user' => optional($order->user)->name ?? '',
+                'quantity' => $order->quantity ?? '',
+                'delivery_method' => $order->delivery_method ?? '',
+                'status' => $order->status ?? '',
+            ];
         });
 
-        return view('orders.index', ['orders' => $orders]);
+        return view('orders.index', ['orders' => $orders, 'ordersForJson' => $ordersForJson]);
     }
 
     // En Order.php

@@ -11,9 +11,28 @@ use App\Models\User;
 class ProductController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all(); // o solo activos/visibles
+        $query = Product::with('user');
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+        if ($request->filled('seller_ids')) {
+            $query->whereIn('user_id', $request->seller_ids);
+        }
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+        if ($request->filled('category_ids')) {
+            $query->whereIn('category_id', $request->category_ids);
+        }
+        $products = $query->get();
         return view('buyer.products.index', compact('products'));
     }
 

@@ -60,7 +60,7 @@ class BuyerController extends Controller
             // El admin puede ver todos los pedidos
             $orders = Order::all();
         } else {
-            $orders = Order::where('user_id', Auth::id())->get();
+        $orders = Order::where('user_id', Auth::id())->get();
         }
         return view('buyer.orders.index', compact('orders'));
     }

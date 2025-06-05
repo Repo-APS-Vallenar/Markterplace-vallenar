@@ -20,6 +20,15 @@
                     <label for="createDescription" class="block text-sm font-medium text-gray-700">Descripción</label>
                     <textarea name="description" id="createDescription" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required></textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Categoría</label>
+                    <select name="category_id" class="w-full border rounded px-3 py-2 mt-1">
+                        <option value="">Seleccione una categoría</option>
+                        @foreach(App\Models\Category::all() as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="px-4 py-3 bg-gray-100 text-right">
                 <button type="button" id="cancelCreateModal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Cancelar</button>

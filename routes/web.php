@@ -10,6 +10,7 @@ use App\Http\Controllers\Buyer\ProductController as BuyerProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Middleware\CheckRole;
+use App\Http\Controllers\Admin\AdminUserController;
 
 // Ruta de bienvenida
 Route::view('/', 'welcome')->name('welcome');
@@ -46,13 +47,19 @@ Route::prefix('admin')
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
 
-        // Gestión de usuarios
+        // Gestión de usuarios (clásica)
         Route::get('/users', [AdminController::class, 'listUsers'])->name('users.index');
         Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
         Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
         Route::get('/users/{user}/edit', [AdminController::class, 'showUser'])->name('users.edit');
         Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+
+        // Supervisión de vendedores
+        Route::get('/supervise-sellers', [AdminUserController::class, 'index'])->name('supervise_sellers');
+
+        // Supervisión de compradores
+        Route::get('/buyers', [AdminUserController::class, 'buyers'])->name('buyers.index');
     });
 
 // Panel vendedor
@@ -103,8 +110,14 @@ Route::prefix('buyer')
         Route::delete('/products/{product}/order', [OrderController::class, 'destroy'])->name('orders.destroy');
     });
 
+// Ver todos los productos (comprador)
+Route::get('/buyer/products', [App\Http\Controllers\Buyer\ProductController::class, 'index'])->name('buyer.products.index');
+
 // Carrito de compras (funcional para todos los usuarios autenticados)
 Route::middleware('auth')->group(function () {
     Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
 });

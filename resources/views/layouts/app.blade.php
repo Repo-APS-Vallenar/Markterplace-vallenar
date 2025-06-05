@@ -45,7 +45,7 @@
     
     
     @yield('scripts')
-
+    
     <script>
         console.log("ROL del usuario: '{{ Auth::user()->role }}'");
         console.log("URL actual: '{{ url()->current() }}'");

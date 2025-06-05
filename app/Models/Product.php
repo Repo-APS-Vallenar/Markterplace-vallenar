@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Order;
+use App\Models\Category;
 
 class Product extends Model
 {
@@ -18,6 +19,7 @@ class Product extends Model
         'price',
         'description',
         'user_id', // Relacionado con el vendedor (usuario)
+        'category_id',
     ];
 
     // Relación inversa con el modelo User (vendedor)
@@ -35,5 +37,11 @@ class Product extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    // Relación con Category
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

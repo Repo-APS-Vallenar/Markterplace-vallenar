@@ -9,10 +9,86 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'seller')->get();
+        $query = User::where('role', 'seller')
+            ->with(['products' => function($q) {
+                $q->with('orders');
+            }]);
+
+        // Filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro de estado
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        // Filtro de fechas
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $users = $query->paginate(10);
+        $users->getCollection()->transform(function($u) {
+            $u->products_count = $u->products->count();
+            $u->orders_count = $u->products->reduce(function($carry, $product) {
+                return $carry + $product->orders->count();
+            }, 0);
+            return $u;
+        });
         return view('admin.users.index', compact('users'));
+    }
+
+    public function buyers(Request $request)
+    {
+        $query = User::where('role', 'buyer')
+            ->with('orders');
+
+        // Filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro de estado
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+
+        // Filtro de fechas
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $buyers = $query->paginate(10);
+        $buyersForJson = $buyers->getCollection()->map(function($b) {
+            return [
+                'id' => $b->id,
+                'name' => $b->name,
+                'email' => $b->email,
+                'status' => $b->is_active ? 'Activo' : 'Suspendido',
+                'orders_count' => $b->orders->count(),
+                'created_at' => $b->created_at->format('d/m/Y'),
+                'last_login' => $b->last_login_at ? $b->last_login_at->format('d/m/Y H:i') : 'Nunca',
+            ];
+        });
+        return view('admin.buyers.index', compact('buyers', 'buyersForJson'));
     }
 
     public function create()

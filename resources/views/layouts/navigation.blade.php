@@ -9,58 +9,55 @@
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
                     </a>
                 </div>
-
-                <!-- Módulos principales con el mismo estilo -->
-                <div class="flex space-x-8 sm:ms-10">
-                    @php $rol = Auth::user()->role; @endphp
-                    @if ($rol === 'admin')
-                        <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.*')">
-                            Administrador
-                        </x-nav-link>
-                        <x-nav-link :href="route('seller.index')" :active="request()->routeIs('seller.*')">
-                            Vendedor
-                        </x-nav-link>
-                        <x-nav-link :href="route('buyer.index')" :active="request()->routeIs('buyer.*')">
-                            Comprador
-                        </x-nav-link>
-                        <x-nav-link :href="route('buyer.products.by_user', ['userId' => Auth::id()])" :active="request()->routeIs('buyer.products.by_user')">
-                            Ver Productos
-                        </x-nav-link>
-                    @elseif ($rol === 'seller')
-                        <x-nav-link :href="route('seller.index')" :active="request()->routeIs('seller.*')">
-                            Vendedor
-                        </x-nav-link>
-                    @elseif ($rol === 'buyer')
-                        <x-nav-link :href="route('buyer.index')" :active="request()->routeIs('buyer.*')">
-                            Comprador
-                        </x-nav-link>
-                        <x-nav-link :href="route('buyer.products.by_user', ['userId' => Auth::id()])" :active="request()->routeIs('buyer.products.by_user')">
-                            Ver Productos
-                        </x-nav-link>
-                    @endif
-                </div>
-
-                <!-- Navigation Links -->
+                                <!-- Navigation Links -->
                 <div class="flex space-x-8 sm:ms-10">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('MARKETPLACE VALLENAR') }}
                     </x-nav-link>
                 </div>
 
-                <!-- Enlace de prueba siempre visible -->
-                @php
-                $user = auth()->user();
-                $sellerId = $user->id; // o un ID fijo si quieres mostrar productos de un vendedor específico
-                @endphp
-
-                @if ($user->role === 'buyer')
-                <div class="flex space-x-8 sm:ms-10">
-                    <x-nav-link :href="route('buyer.products.by_user', ['userId' => $sellerId])"
-                        :active="request()->routeIs('buyer.products.by_user')">
-                        {{ __('Ver Productos') }}
-                    </x-nav-link>
+                <!-- Menú dinámico según tipo de usuario -->
+                <div class="flex space-x-8 sm:ms-10 items-center">
+                    @guest
+                        <x-nav-link :href="route('buyer.products.by_user', ['userId' => 2])" :active="request()->routeIs('buyer.products.by_user')">
+                            Ver Productos
+                        </x-nav-link>
+                        <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                            Iniciar sesión
+                        </x-nav-link>
+                        <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                            Registrarse
+                        </x-nav-link>
+                    @else
+                        @php $rol = Auth::user()->role; @endphp
+                        @if ($rol === 'admin')
+                            <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index')">
+                                Panel de administración
+                            </x-nav-link>
+                        @elseif ($rol === 'seller')
+                            <x-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.*')">
+                                Gestionar Productos
+                            </x-nav-link>
+                            <x-nav-link :href="route('seller.orders')" :active="request()->routeIs('seller.orders')">
+                                Ver Pedidos Recibidos
+                            </x-nav-link>
+                            <x-nav-link :href="route('buyer.products.index')" :active="request()->routeIs('buyer.products.index')">
+                                Ver Productos
+                            </x-nav-link>
+                            
+                        @elseif ($rol === 'buyer')
+                            <x-nav-link :href="route('buyer.products.index')" :active="request()->routeIs('buyer.products.index')">
+                                Ver Productos
+                            </x-nav-link>
+                            <x-nav-link :href="route('buyer.orders.index')" :active="request()->routeIs('buyer.orders.index')">
+                                Mis Pedidos
+                            </x-nav-link>
+                            <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
+                                Ver Carrito
+                            </x-nav-link>
+                        @endif
+                    @endguest
                 </div>
-                @endif
             </div>
 
             <!-- Settings Dropdown -->
