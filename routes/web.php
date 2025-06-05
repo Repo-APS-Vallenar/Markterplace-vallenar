@@ -41,7 +41,7 @@ Route::middleware('auth')->prefix('orders')->name('orders.')->group(function () 
 
 // Panel administrador
 Route::prefix('admin')
-    ->middleware(['auth', CheckRole::class . ':admin'])
+    ->middleware(['auth'])
     ->as('admin.')
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
@@ -57,7 +57,7 @@ Route::prefix('admin')
 
 // Panel vendedor
 Route::prefix('seller')
-    ->middleware(['auth', CheckRole::class . ':seller'])
+    ->middleware(['auth'])
     ->as('seller.')
     ->group(function () {
         Route::get('/', [SellerController::class, 'index'])->name('index');
@@ -77,7 +77,7 @@ Route::get('/products/{userId}', [BuyerProductController::class, 'showProducts']
 
 // Panel comprador
 Route::prefix('buyer')
-    ->middleware(['auth', CheckRole::class . ':buyer'])
+    ->middleware(['auth'])
     ->as('buyer.')
     ->group(function () {
         Route::get('/', [BuyerController::class, 'index'])->name('index');

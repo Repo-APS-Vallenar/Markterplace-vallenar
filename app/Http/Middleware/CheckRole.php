@@ -3,21 +3,21 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class CheckRole
 {
-    public function handle($request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (! Auth::check()) {
-            return redirect()->route('login');
+        $user = $request->user();
+
+        // Convertir string con separador a array (por ejemplo: 'admin|seller')
+        if (count($roles) === 1 && str_contains($roles[0], '|')) {
+            $roles = explode('|', $roles[0]);
         }
 
-        $user = Auth::user();
-
-        // Spatie: verifica si tiene **alguno** de los roles permitidos
-        if (! $user->hasAnyRole($roles)) {
-            abort(403, 'No tienes permiso para acceder a esta sección.');
+        if (!$user || !in_array($user->role, $roles)) {
+            abort(403, 'Acceso no autorizado.');
         }
 
         return $next($request);

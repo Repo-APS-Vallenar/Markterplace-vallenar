@@ -13,9 +13,9 @@ class BuyerController extends Controller
 {
     public function __construct()
     {
-        // Verifica que el usuario tenga el rol de 'buyer' antes de continuar
+        // Verifica que el usuario tenga el rol de 'buyer' o 'admin' antes de continuar
         $this->middleware(function ($request, $next) {
-            if (Auth::check() && !Auth::user()->hasRole('buyer')) {
+            if (Auth::check() && !in_array(Auth::user()->role, ['buyer', 'admin'])) {
                 return abort(403, 'Unauthorized');
             }
 

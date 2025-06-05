@@ -33,24 +33,23 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Validar los campos del formulario
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:buyer,seller'], // Validación para el rol
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:buyer,seller,admin', // Validación para el rol
         ]);
 
-        // Crear el nuevo usuario
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => bcrypt($request->password),
+            'role' => $request->role,
         ]);
 
         // Asignar el rol al usuario
         Log::debug('Role asignado:', [$request->role]);
-        $user->assignRole($request->role);
+        $user->role === ($request->role);
 
         // Disparar el evento de registro
         event(new Registered($user));

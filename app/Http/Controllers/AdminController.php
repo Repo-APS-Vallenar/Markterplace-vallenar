@@ -20,7 +20,7 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (Auth::check() && ! Auth::user()->hasRole('admin')) {
+            if (Auth::check() && Auth::user()->role !== 'admin') {
                 abort(403, 'Unauthorized');
             }
             return $next($request);

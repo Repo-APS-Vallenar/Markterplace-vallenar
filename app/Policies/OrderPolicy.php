@@ -12,9 +12,9 @@ class OrderPolicy
      */
     public function view(User $user, Order $order)
     {
-        return $user->hasRole('admin') ||
-               ($user->hasRole('seller') && $order->product->seller_id == $user->id) ||
-               ($user->hasRole('buyer') && $order->user_id == $user->id);
+        return $user->role === 'admin' ||
+               ($user->role === 'seller' && $order->product->seller_id == $user->id) ||
+               ($user->role === 'buyer' && $order->user_id == $user->id);
     }
 
     /**
@@ -22,7 +22,7 @@ class OrderPolicy
      */
     public function create(User $user)
     {
-        return $user->hasRole('buyer');
+        return $user->role === 'buyer';
     }
 
     /**
@@ -30,8 +30,8 @@ class OrderPolicy
      */
     public function update(User $user, Order $order)
     {
-        return $user->hasRole('admin') ||
-               ($user->hasRole('seller') && $order->product->seller_id == $user->id);
+        return $user->role==='admin' ||
+               ($user->role==='seller' && $order->product->seller_id == $user->id);
     }
 
     /**
@@ -39,8 +39,8 @@ class OrderPolicy
      */
     public function delete(User $user, Order $order)
     {
-        return $user->hasRole('admin') ||
-               ($user->hasRole('buyer') && $order->user_id == $user->id);
+        return $user->role==='admin' ||
+               ($user->role==='buyer' && $order->user_id == $user->id);
     }
 }
 

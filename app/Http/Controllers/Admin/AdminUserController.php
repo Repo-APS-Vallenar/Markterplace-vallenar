@@ -11,7 +11,7 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        $users = User::role('seller')->get();
+        $users = User::where('role', 'seller')->get();
         return view('admin.users.index', compact('users'));
     }
 
@@ -29,21 +29,22 @@ class AdminUserController extends Controller
         ]);
 
         $data['password'] = Hash::make($data['password']);
+        $data['role'] = 'seller';
+
         $user = User::create($data);
-        $user->assignRole('seller');
 
         return redirect()->route('admin.users.index')->with('success', 'Vendedor creado.');
     }
 
     public function edit(User $user)
     {
-        abort_unless($user->hasRole('seller'), 404);
+        abort_unless($user->role === 'seller', 404);
         return view('admin.users.edit', compact('user'));
     }
 
     public function update(Request $request, User $user)
     {
-        abort_unless($user->hasRole('seller'), 404);
+        abort_unless($user->role === 'seller', 404);
 
         $data = $request->validate([
             'name'     => 'required|string|max:255',
@@ -62,7 +63,7 @@ class AdminUserController extends Controller
 
     public function destroy(User $user)
     {
-        abort_unless($user->hasRole('seller'), 404);
+        abort_unless($user->role === 'seller', 404);
         $user->delete();
         return back()->with('success', 'Vendedor eliminado.');
     }

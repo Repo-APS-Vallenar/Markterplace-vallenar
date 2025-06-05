@@ -6,23 +6,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+
 use Illuminate\Support\Facades\Auth;
 
+// En App\Models\User.php
+
 class User extends Authenticatable
-
-
 {
-    use HasRoles;
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-
 
     protected $fillable = [
         'name',
@@ -31,21 +22,11 @@ class User extends Authenticatable
         'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -54,10 +35,24 @@ class User extends Authenticatable
         ];
     }
 
+    public function isBuyer()
+    {
+        return $this->role === 'buyer';
+    }
+
+    public function isSeller()
+    {
+        return $this->role === 'seller';
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'user_id');  // Aquí se debe utilizar 'user_id'
+        return $this->hasMany(Product::class, 'user_id');
     }
 
     public function orders()
@@ -69,5 +64,4 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'seller_id');
     }
-
 }

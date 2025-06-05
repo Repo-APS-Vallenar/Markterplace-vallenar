@@ -10,6 +10,8 @@
                     </a>
                 </div>
 
+                @yield('navbar-modulos')
+
                 <!-- Navigation Links -->
                 <div class="flex space-x-8 sm:ms-10">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
@@ -17,24 +19,24 @@
                     </x-nav-link>
                 </div>
 
-                <!-- 2) Panel de admin: solo si el usuario tiene el rol 'admin' -->
-                @role('admin|seller')
+                <!-- Panel de admin o vendedor: solo si el usuario tiene el rol 'admin' o 'seller' -->
+                @if (Auth::user()->role === 'admin' || Auth::user()->role === 'seller')
                 <div class="flex space-x-8 sm:ms-10">
                     <x-nav-link
-                        :href="route('admin.index')"
-                        :active="request()->routeIs('admin.index')">
+                        :href="route('seller.index')"
+                        :active="request()->routeIs('seller.*')">
                         {{ __('Panel de Vendedor') }}
                     </x-nav-link>
                 </div>
-                @endrole
+                @endif
 
-                <!-- 3) Enlace de prueba siempre visible -->
+                <!-- Enlace de prueba siempre visible -->
                 @php
                 $user = auth()->user();
                 $sellerId = $user->id; // o un ID fijo si quieres mostrar productos de un vendedor específico
                 @endphp
 
-                @if ($user->hasRole('buyer'))
+                @if ($user->role === 'buyer')
                 <div class="flex space-x-8 sm:ms-10">
                     <x-nav-link :href="route('buyer.products.by_user', ['userId' => $sellerId])"
                         :active="request()->routeIs('buyer.products.by_user')">

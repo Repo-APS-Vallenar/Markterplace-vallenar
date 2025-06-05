@@ -5,7 +5,7 @@ use App\Http\Controllers\Buyer\BuyerController;
 use App\Http\Controllers\OrderController;
 
 Route::prefix('buyer')
-    ->middleware(['auth', 'checkrole:buyer'])
+    ->middleware(['auth', 'checkrole:buyer,admin'])
     ->as('buyer.')
     ->group(function () {
         // Dashboard de Comprador

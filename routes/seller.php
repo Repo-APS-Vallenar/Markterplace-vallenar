@@ -5,7 +5,7 @@ use App\Http\Controllers\Seller\SellerProductController;
 use App\Http\Controllers\Seller\SellerController;
 
 Route::prefix('seller')
-    ->middleware(['auth', 'checkrole:seller'])
+    ->middleware(['auth', 'checkrole:seller,admin'])
     ->as('seller.')
     ->group(function () {
         // Dashboard de Vendedor

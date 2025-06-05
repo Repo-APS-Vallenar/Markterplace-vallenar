@@ -26,15 +26,15 @@ class OrderController extends Controller
     // En Order.php
     public function scopeVisibleTo($query, User $user)
     {
-        if ($user->hasRole('admin')) {
+        if ($user->role === 'admin') {
             return $query;
         }
 
-        if ($user->hasRole('seller')) {
+        if ($user->role === 'seller') {
             return $query->whereHas('product', fn($q) => $q->where('seller_id', $user->id));
         }
 
-        if ($user->hasRole('buyer')) {
+        if ($user->role === 'buyer') {
             return $query->where('user_id', $user->id);
         }
 
