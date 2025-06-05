@@ -56,7 +56,12 @@ class BuyerController extends Controller
     // Ver los pedidos del comprador
     public function orders()
     {
-        $orders = Order::where('user_id', Auth::id())->get();
+        if (Auth::user()->role === 'admin') {
+            // El admin puede ver todos los pedidos
+            $orders = Order::all();
+        } else {
+            $orders = Order::where('user_id', Auth::id())->get();
+        }
         return view('buyer.orders.index', compact('orders'));
     }
 
@@ -73,8 +78,8 @@ class BuyerController extends Controller
     // Ver detalles de un pedido específico
     public function showOrder(Order $order)
     {
-        // Solo permitir que el comprador vea su propio pedido
-        if ($order->user_id != Auth::id()) {
+        // Solo permitir que el comprador vea su propio pedido, pero el admin puede ver cualquiera
+        if (Auth::user()->role !== 'admin' && $order->user_id != Auth::id()) {
             return redirect()->route('buyer.orders.index')->with('error', 'Acción no permitida.');
         }
 

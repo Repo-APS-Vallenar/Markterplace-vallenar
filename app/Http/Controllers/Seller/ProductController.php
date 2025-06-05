@@ -12,7 +12,11 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::where('user_id', Auth::id())->get();
+        if (Auth::user()->role === 'admin' || Auth::user()->role === 'seller') {
+            $products = Product::all();
+        } else {
+            $products = Product::where('seller_id', Auth::id())->get();
+        }
         return view('seller.products.index', compact('products'));
     }
 
@@ -44,7 +48,7 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        if ($product->user_id !== Auth::id()) {
+        if ($product->seller_id !== Auth::id()) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
@@ -75,7 +79,7 @@ class ProductController extends Controller
     // Eliminar un producto
     public function destroy(Product $product)
     {
-        if ($product->user_id !== Auth::id()) {
+        if ($product->seller_id !== Auth::id()) {
             return redirect()->route('seller.products.index');
         }
 

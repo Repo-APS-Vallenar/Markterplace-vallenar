@@ -10,7 +10,35 @@
                     </a>
                 </div>
 
-                @yield('navbar-modulos')
+                <!-- Módulos principales con el mismo estilo -->
+                <div class="flex space-x-8 sm:ms-10">
+                    @php $rol = Auth::user()->role; @endphp
+                    @if ($rol === 'admin')
+                        <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.*')">
+                            Administrador
+                        </x-nav-link>
+                        <x-nav-link :href="route('seller.index')" :active="request()->routeIs('seller.*')">
+                            Vendedor
+                        </x-nav-link>
+                        <x-nav-link :href="route('buyer.index')" :active="request()->routeIs('buyer.*')">
+                            Comprador
+                        </x-nav-link>
+                        <x-nav-link :href="route('buyer.products.by_user', ['userId' => Auth::id()])" :active="request()->routeIs('buyer.products.by_user')">
+                            Ver Productos
+                        </x-nav-link>
+                    @elseif ($rol === 'seller')
+                        <x-nav-link :href="route('seller.index')" :active="request()->routeIs('seller.*')">
+                            Vendedor
+                        </x-nav-link>
+                    @elseif ($rol === 'buyer')
+                        <x-nav-link :href="route('buyer.index')" :active="request()->routeIs('buyer.*')">
+                            Comprador
+                        </x-nav-link>
+                        <x-nav-link :href="route('buyer.products.by_user', ['userId' => Auth::id()])" :active="request()->routeIs('buyer.products.by_user')">
+                            Ver Productos
+                        </x-nav-link>
+                    @endif
+                </div>
 
                 <!-- Navigation Links -->
                 <div class="flex space-x-8 sm:ms-10">
@@ -18,17 +46,6 @@
                         {{ __('MARKETPLACE VALLENAR') }}
                     </x-nav-link>
                 </div>
-
-                <!-- Panel de admin o vendedor: solo si el usuario tiene el rol 'admin' o 'seller' -->
-                @if (Auth::user()->role === 'admin' || Auth::user()->role === 'seller')
-                <div class="flex space-x-8 sm:ms-10">
-                    <x-nav-link
-                        :href="route('seller.index')"
-                        :active="request()->routeIs('seller.*')">
-                        {{ __('Panel de Vendedor') }}
-                    </x-nav-link>
-                </div>
-                @endif
 
                 <!-- Enlace de prueba siempre visible -->
                 @php

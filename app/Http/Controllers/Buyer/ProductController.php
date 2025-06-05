@@ -19,9 +19,8 @@ class ProductController extends Controller
 
     public function showProducts($userId)
     {
-        $user = User::findOrFail($userId); // Usamos findOrFail para garantizar que siempre se obtenga un usuario válido
-        $products = $user->products; // Esto debería funcionar si la relación está configurada correctamente
-
+        $user = User::findOrFail($userId);
+        $products = Product::where('seller_id', $user->id)->get();
         return view('buyer.products.by_user', compact('products', 'user'));
     }
 }

@@ -1,12 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-@if(auth()->check() && auth()->user()->roles && auth()->user()->roles->pluck('name')->intersect(['admin', 'seller'])->isNotEmpty())
+@if(auth()->check() && in_array(auth()->user()->role, ['admin', 'seller']))
 <div class="container mx-auto py-8 px-4">
-    <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Panel de Vendedor</h1>
+    <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">
+        @if(auth()->user()->role === 'admin')
+            Panel de Administrador (Gestión de vendedores)
+        @else
+            Panel de Vendedor
+        @endif
+    </h1>
 
     <div class="text-center mb-6">
-        <p class="text-xl font-medium text-gray-600">Bienvenido, {{ auth()->user()->name }} ({{ auth()->user()->roles->pluck('name')->join(', ') }}).</p>
+        <p class="text-xl font-medium text-gray-600">
+            Bienvenido, {{ auth()->user()->name }}. Eres {{ auth()->user()->role === 'admin' ? 'administrador' : 'vendedor' }}.
+        </p>
     </div>
 
     <div class="bg-white shadow-md rounded-md p-3 max-w-md text-center mx-auto">

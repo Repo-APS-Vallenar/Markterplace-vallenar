@@ -73,7 +73,9 @@ Route::prefix('seller')
         // Pedidos asociados a productos del vendedor
         Route::get('/orders', [SellerController::class, 'orders'])->name('orders.index');
     });
-Route::get('/products/{userId}', [BuyerProductController::class, 'showProducts'])->name('buyer.products.by_user');
+Route::get('/products/{userId}', [BuyerProductController::class, 'showProducts'])
+    ->middleware(['auth', 'checkrole:buyer,admin'])
+    ->name('buyer.products.by_user');
 
 // Panel comprador
 Route::prefix('buyer')
