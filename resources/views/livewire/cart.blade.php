@@ -1,0 +1,171 @@
+<div>
+    @php
+        $total = 0;
+        $totalUnidades = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+            $totalUnidades += $item['quantity'];
+        }
+    @endphp
+    <style>
+        .cart-btn {
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+        }
+        .cart-btn:focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        .cart-btn-inc {
+            background: #d1fae5;
+            color: #059669;
+        }
+        .cart-btn-inc:hover, .cart-btn-inc:focus {
+            background: #6ee7b7;
+            color: #065f46;
+            transform: scale(1.1);
+        }
+        .cart-btn-dec {
+            background: #fef9c3;
+            color: #b45309;
+        }
+        .cart-btn-dec:hover, .cart-btn-dec:focus {
+            background: #fde68a;
+            color: #92400e;
+            transform: scale(1.1);
+        }
+        .cart-btn-del {
+            background: #fee2e2;
+            color: #dc2626;
+            box-shadow: 0 2px 8px #fca5a5;
+        }
+        .cart-btn-del:hover, .cart-btn-del:focus {
+            background: #fca5a5;
+            color: #991b1b;
+            transform: scale(1.15) rotate(-8deg);
+        }
+        .cart-qty-input {
+            transition: box-shadow 0.2s;
+        }
+        .cart-qty-input:focus {
+            box-shadow: 0 0 0 2px #2563eb33;
+            border-color: #2563eb;
+        }
+        .cart-sticky {
+            box-shadow: 0 4px 24px #0001;
+        }
+        .cart-row-anim {
+            animation: cartFadeIn 0.4s;
+        }
+        @keyframes cartFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: none; }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s; }
+    </style>
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <div class="text-lg font-semibold flex items-center gap-2">
+            <span>Productos en carrito:</span>
+            <span class="text-blue-700 font-bold text-2xl animate-pulse">{{ $totalUnidades }}</span>
+        </div>
+        <div class="text-right text-lg font-semibold flex items-center gap-2">
+            <span>Total a pagar:</span>
+            <span class="text-green-700 font-bold text-3xl animate-pulse">${{ number_format($total, 0, ',', '.') }}</span>
+        </div>
+    </div>
+    @if($totalUnidades == 0)
+        <div class="flex flex-col items-center justify-center py-16">
+            <i class="fas fa-shopping-basket text-7xl text-gray-300 mb-6"></i>
+            <h2 class="text-2xl font-bold text-gray-500 mb-2">¡Tu carrito está vacío!</h2>
+            <p class="text-gray-400 mb-6">Agrega productos y aparecerán aquí para que puedas comprarlos fácilmente.</p>
+            <a href="{{ route('buyer.products.index') }}" class="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-lg text-lg font-bold shadow hover:bg-blue-700 transition">
+                <i class="fas fa-store"></i> Ir a la tienda
+            </a>
+        </div>
+    @else
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white shadow-lg rounded-xl overflow-hidden mb-8">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-base font-bold text-gray-700">Producto</th>
+                        <th class="px-6 py-3 text-center text-base font-bold text-gray-700">Cantidad</th>
+                        <th class="px-6 py-3 text-right text-base font-bold text-gray-700">Precio</th>
+                        <th class="px-6 py-3 text-right text-base font-bold text-gray-700">Subtotal</th>
+                        <th class="px-6 py-3 text-center text-base font-bold text-gray-700">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($cart as $id => $item)
+                        <tr class="cart-row-anim {{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition">
+                            <td class="px-6 py-4 align-middle text-base font-medium">{{ $item['name'] }}</td>
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button type="button" class="cart-btn cart-btn-dec shadow-sm rounded-full w-10 h-10 flex items-center justify-center text-xl" wire:click="decrease('{{ $id }}')" aria-label="Disminuir">
+                                        <span>-</span>
+                                    </button>
+                                    <input type="text" readonly value="{{ $item['quantity'] }}" class="cart-qty-input w-14 text-center border border-gray-300 rounded font-semibold bg-gray-100">
+                                    <button type="button" class="cart-btn cart-btn-inc shadow-sm rounded-full w-10 h-10 flex items-center justify-center text-xl" wire:click="increase('{{ $id }}')" aria-label="Aumentar">
+                                        <span>+</span>
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 align-middle text-right text-base font-semibold">${{ number_format($item['price'], 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 align-middle text-right text-base font-semibold">${{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</td>
+                            <td class="px-6 py-4 align-middle text-center">
+                                <button type="button" class="cart-btn cart-btn-del shadow-md rounded-full w-10 h-10 flex items-center justify-center hover:scale-110 transition" wire:click="remove('{{ $id }}')" title="Eliminar">
+                                    <i class="fas fa-trash-alt text-xl"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="cart-sticky flex flex-col md:flex-row md:justify-center items-center mt-8 gap-4 bg-white rounded-2xl shadow-2xl px-8 py-6 border border-gray-100">
+            <form wire:submit.prevent="openCheckoutModal" class="w-full md:w-auto flex justify-center order-1 md:order-2">
+                <button type="submit"
+                    class="flex items-center gap-2 bg-green-600 shadow-lg text-white px-10 py-3 rounded-lg hover:bg-green-700 text-lg font-bold transition focus:outline-none focus:ring-2 focus:ring-green-400 w-full md:w-auto justify-center">
+                    <i class="fas fa-check-circle text-xl"></i>
+                    Finalizar compra
+                </button>
+            </form>
+            <a href="{{ route('buyer.products.index') }}"
+               class="flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-semibold transition text-base shadow-sm order-2 md:order-1">
+                <i class="fas fa-arrow-left"></i>
+                Seguir comprando
+            </a>
+        </div>
+    @endif
+
+    @if($showCheckoutModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-fadeIn">
+                <button wire:click="closeCheckoutModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+                <h2 class="text-xl font-bold mb-6 text-center">Confirmar pedido</h2>
+                <form wire:submit.prevent="checkout" class="flex flex-col gap-4">
+                    <div>
+                        <label class="block font-semibold mb-2">Método de pago:</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" wire:model="payment_method" name="payment_method" value="cash" class="accent-green-600">
+                                <span>Efectivo al recibir</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" wire:model="payment_method" name="payment_method" value="transfer" class="accent-blue-600">
+                                <span>Transferencia bancaria</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-2">Nota para el vendedor (opcional):</label>
+                        <textarea wire:model="notes" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-200"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700 transition">Confirmar pedido</button>
+                </form>
+            </div>
+        </div>
+    @endif
+</div>

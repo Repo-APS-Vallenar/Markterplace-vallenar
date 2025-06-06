@@ -15,7 +15,12 @@ class Order extends Model
     protected $fillable = [
         'user_id', // Comprador
         'product_id', // Producto
+        'seller_id',
         'status', // Estado del pedido (pendiente, procesado, completado, etc.)
+        'payment_method',
+        'total',
+        'notes',
+        'quantity',
     ];
 
     // Relación con el modelo User (comprador)

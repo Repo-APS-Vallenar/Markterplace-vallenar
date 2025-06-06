@@ -46,88 +46,121 @@
         <h1 class="text-2xl font-bold">Mi carrito</h1>
     </div>
     <div id="cart-messages"></div>
-    @if(empty($cart) || count($cart) === 0)
-        <div class="flex flex-col items-center justify-center py-12">
-            <span class="text-6xl mb-4">🛒</span>
-            <p class="text-lg text-gray-600 mb-2">Tu carrito está vacío.</p>
-            <a href="{{ route('buyer.products.index') }}" class="mt-2 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Seguir comprando</a>
-        </div>
-    @else
-        <div id="cart-content" class="cart-anim">
-            @include('buyer.cart.partials.table', ['cart' => $cart])
-        </div>
-    @endif
+    <livewire:cart />
+</div>
+
+<div id="cart-loader" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:1000;justify-content:center;align-items:center;background:rgba(255,255,255,0.5)">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
 </div>
 
 <script>
-function showCartMessage(msg, type = 'success') {
-    const el = document.getElementById('cart-messages');
-    el.innerHTML = `<div class='mb-4 p-4 rounded border ${type==='success' ? 'border-green-400 bg-green-100 text-green-800' : 'border-red-400 bg-red-100 text-red-800'} flex justify-between items-center'>${msg}<button onclick='this.parentElement.remove()' class='ml-4'>&times;</button></div>`;
-    setTimeout(() => { el.innerHTML = ''; }, 3000);
-}
-
-async function updateCart(productId, action) {
-    console.log('updateCart', productId, action);
-    let formData = new FormData();
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('_method', 'PUT');
-    formData.append('action', action);
-    const res = await fetch(`/cart/${productId}`, { method: 'POST', body: formData });
-    if (res.ok) {
-        const html = await res.text();
-        console.log('HTML recibido:', html);
-        const cartDiv = document.getElementById('cart-content');
-        cartDiv.innerHTML = html;
-        showCartMessage('Carrito actualizado');
-    } else {
-        showCartMessage('Error al actualizar el carrito', 'error');
-    }
-}
-
-async function removeFromCart(productId) {
-    if (!confirm('¿Eliminar este producto del carrito?')) return;
-    console.log('removeFromCart', productId);
-    let formData = new FormData();
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('_method', 'DELETE');
-    const res = await fetch(`/cart/${productId}`, { method: 'POST', body: formData });
-    if (res.ok) {
-        const html = await res.text();
-        console.log('HTML recibido:', html);
-        const cartDiv = document.getElementById('cart-content');
-        cartDiv.innerHTML = html;
-        showCartMessage('Producto eliminado');
-    } else {
-        showCartMessage('Error al eliminar', 'error');
-    }
-}
-
 (function() {
     if (window.__cartListenerAdded) return;
     window.__cartListenerAdded = true;
-    document.body.addEventListener('click', function(e) {
+
+    function showCartMessage(msg, type = 'success') {
+        const el = document.getElementById('cart-messages');
+        el.innerHTML = `<div class='mb-4 p-4 rounded border ${type==='success' ? 'border-green-400 bg-green-100 text-green-800' : 'border-red-400 bg-red-100 text-red-800'} flex justify-between items-center'>${msg}<button onclick='this.parentElement.remove()' class='ml-4'>&times;</button></div>`;
+        setTimeout(() => { el.innerHTML = ''; }, 3000);
+    }
+
+    function setCartLoading(loading) {
+        document.getElementById('cart-loader').style.display = loading ? 'flex' : 'none';
+        document.querySelectorAll('.cart-btn').forEach(btn => btn.disabled = loading);
+        const cartDiv = document.getElementById('cart-content');
+        if (cartDiv) {
+            if (loading) cartDiv.classList.add('loading');
+            else cartDiv.classList.remove('loading');
+        }
+    }
+
+    function updateDOMQuantity(productId, delta) {
+        const input = document.querySelector(`.cart-qty-input[data-id='${productId}']`);
+        if (!input) return;
+        let oldValue = parseInt(input.value);
+        let newValue = oldValue + delta;
+        if (newValue < 1) newValue = 1;
+        input.value = newValue;
+        let totalItems = 0;
+        let totalPrice = 0;
+        document.querySelectorAll('.cart-qty-input').forEach(inp => {
+            const qty = parseInt(inp.value);
+            const price = parseInt(inp.closest('tr').querySelector('td:nth-child(3)').textContent.replace(/[^\d]/g, ''));
+            totalItems += qty;
+            totalPrice += qty * price;
+        });
+        document.getElementById('cart-total-items').textContent = totalItems;
+        document.getElementById('cart-total-price').textContent = '$' + totalPrice.toLocaleString('es-CL');
+    }
+
+    async function updateCart(productId, action) {
+        updateDOMQuantity(productId, action === 'increase' ? 1 : -1);
+        setCartLoading(true);
+        const res = await fetch(`/cart/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: new URLSearchParams({
+                _method: 'PUT',
+                action: action
+            })
+        });
+        setCartLoading(false);
+        if (!res.ok) {
+            location.reload();
+            showCartMessage('Error al actualizar el carrito', 'error');
+        } else {
+            showCartMessage('Carrito actualizado');
+        }
+    }
+
+    async function removeFromCart(productId) {
+        const row = document.querySelector(`.cart-btn-del[data-id='${productId}']`)?.closest('tr');
+        if (row) {
+            row.remove();
+            let totalItems = 0;
+            let totalPrice = 0;
+            document.querySelectorAll('.cart-qty-input').forEach(inp => {
+                const qty = parseInt(inp.value);
+                const price = parseInt(inp.closest('tr').querySelector('td:nth-child(3)').textContent.replace(/[^\d]/g, ''));
+                totalItems += qty;
+                totalPrice += qty * price;
+            });
+            document.getElementById('cart-total-items').textContent = totalItems;
+            document.getElementById('cart-total-price').textContent = '$' + totalPrice.toLocaleString('es-CL');
+        }
+        setCartLoading(true);
+        const res = await fetch(`/cart/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: new URLSearchParams({
+                _method: 'DELETE'
+            })
+        });
+        setCartLoading(false);
+        if (!res.ok) {
+            location.reload();
+            showCartMessage('Error al eliminar', 'error');
+        } else {
+            showCartMessage('Producto eliminado');
+        }
+    }
+
+    document.addEventListener('click', function(e) {
         if (e.target.classList.contains('cart-btn-inc')) {
             e.preventDefault();
-            e.stopPropagation();
-            const id = e.target.dataset.id;
-            console.log('click +', id);
-            updateCart(id, 'increase');
-        }
-        if (e.target.classList.contains('cart-btn-dec')) {
+            updateCart(e.target.dataset.id, 'increase');
+        } else if (e.target.classList.contains('cart-btn-dec')) {
             e.preventDefault();
-            e.stopPropagation();
-            const id = e.target.dataset.id;
-            console.log('click -', id);
-            updateCart(id, 'decrease');
-        }
-        if (e.target.classList.contains('cart-btn-del')) {
+            updateCart(e.target.dataset.id, 'decrease');
+        } else if (e.target.classList.contains('cart-btn-del')) {
             e.preventDefault();
-            e.stopPropagation();
-            const id = e.target.dataset.id;
-            console.log('click eliminar', id);
-            removeFromCart(id);
+            removeFromCart(e.target.dataset.id);
         }
-    }, false);
+    });
 })();
 </script>
 @endsection 

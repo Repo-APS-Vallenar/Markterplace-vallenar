@@ -129,4 +129,17 @@ class OrderController extends Controller
         return redirect()->route('orders.index')
             ->with('success', 'Pedido eliminado correctamente.');
     }
+
+    public function cancel(Order $order)
+    {
+        if (auth()->user()->id !== $order->user_id && auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+        if ($order->status !== 'pending') {
+            return redirect()->back()->with('error', 'Solo puedes cancelar pedidos pendientes.');
+        }
+        $order->status = 'cancelled';
+        $order->save();
+        return redirect()->route('buyer.orders.index')->with('success', '¡Pedido cancelado correctamente!');
+    }
 }

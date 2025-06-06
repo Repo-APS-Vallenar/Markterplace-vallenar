@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class CartController extends Controller
 {
@@ -45,8 +46,7 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         if (!isset($cart[$productId])) {
-            session()->put('cart', $cart);
-            return $this->cartPartial();
+            return view('buyer.cart.partials.table', ['cart' => $cart])->render();
         }
 
         if ($request->input('action') === 'increase') {
@@ -55,7 +55,10 @@ class CartController extends Controller
             $cart[$productId]['quantity'] -= 1;
         }
         session()->put('cart', $cart);
-        return $this->cartPartial();
+        \Session::save();
+        // Vuelve a obtener el carrito actualizado de la sesión
+        $cart = session()->get('cart', []);
+        return view('buyer.cart.partials.table', ['cart' => $cart])->render();
     }
 
     public function remove($productId)
@@ -63,7 +66,10 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
         unset($cart[$productId]);
         session()->put('cart', $cart);
-        return $this->cartPartial();
+        \Session::save();
+        // Vuelve a obtener el carrito actualizado de la sesión
+        $cart = session()->get('cart', []);
+        return view('buyer.cart.partials.table', ['cart' => $cart])->render();
     }
 
     private function cartPartial()

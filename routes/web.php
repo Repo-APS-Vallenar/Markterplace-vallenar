@@ -38,11 +38,12 @@ Route::middleware('auth')->prefix('orders')->name('orders.')->group(function () 
     Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
     Route::put('/{order}', [OrderController::class, 'update'])->name('update');
     Route::delete('/{order}', [OrderController::class, 'destroy'])->name('destroy');
+    Route::post('/{order}/cancel', [OrderController::class, 'cancel'])->name('cancel');
 });
 
 // Panel administrador
 Route::prefix('admin')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'checkrole:admin'])
     ->as('admin.')
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
