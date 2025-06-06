@@ -115,9 +115,11 @@
                             <td class="px-6 py-4 align-middle text-right text-base font-semibold">${{ number_format($item['price'], 0, ',', '.') }}</td>
                             <td class="px-6 py-4 align-middle text-right text-base font-semibold">${{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</td>
                             <td class="px-6 py-4 align-middle text-center">
-                                <button type="button" class="cart-btn cart-btn-del shadow-md rounded-full w-10 h-10 flex items-center justify-center hover:scale-110 transition" wire:click="remove('{{ $id }}')" title="Eliminar">
-                                    <i class="fas fa-trash-alt text-xl"></i>
-                                </button>
+                                <div class="flex items-center justify-center">
+                                    <button type="button" class="cart-btn cart-btn-del shadow-md rounded-full w-10 h-10 flex items-center justify-center text-xl hover:scale-110 transition m-auto" wire:click="remove('{{ $id }}')" title="Eliminar" style="box-shadow: 0 0 0 8px #fee2e233;">
+                                        <i class="fas fa-trash-alt text-xl"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -142,7 +144,7 @@
 
     @if($showCheckoutModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-fadeIn">
+            <div @click.away="@this.call('closeCheckoutModal')" class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-fadeIn">
                 <button wire:click="closeCheckoutModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
                 <h2 class="text-xl font-bold mb-6 text-center">Confirmar pedido</h2>
                 <form wire:submit.prevent="checkout" class="flex flex-col gap-4">

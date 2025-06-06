@@ -42,18 +42,18 @@
                                 Ver Pedidos Recibidos
                             </x-nav-link>
                             <x-nav-link :href="route('buyer.products.index')" :active="request()->routeIs('buyer.products.index')">
-                                Ver Productos
+                                <i class="fas fa-store mr-1"></i> Ver Productos
                             </x-nav-link>
                             
                         @elseif ($rol === 'buyer')
                             <x-nav-link :href="route('buyer.products.index')" :active="request()->routeIs('buyer.products.index')">
-                                Ver Productos
+                                <i class="fas fa-store mr-1"></i> Ver Productos
                             </x-nav-link>
                             <x-nav-link :href="route('buyer.orders.index')" :active="request()->routeIs('buyer.orders.index')">
-                                Mis Pedidos
+                                <i class="fas fa-clipboard-list mr-1"></i> Mis Pedidos
                             </x-nav-link>
                             <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
-                                Ver Carrito
+                                <i class="fas fa-shopping-cart mr-1"></i> Ver Carrito
                             </x-nav-link>
                         @endif
                     @endguest

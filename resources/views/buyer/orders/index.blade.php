@@ -100,7 +100,7 @@
                 </table>
             </div>
             <div x-show="showModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-fadeIn border-t-8 border-green-500">
+                <div @click.away="showModal = false" class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative animate-fadeIn border-t-8 border-green-500">
                     <button @click="showModal = false" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
                     <div class="flex flex-col items-center mb-4">
                         <i class="fas fa-receipt text-4xl text-green-500 mb-2"></i>
@@ -139,7 +139,7 @@
                 </div>
             </div>
             <div x-show="showCancelModal" x-cloak class="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
-                <div class="bg-white rounded-xl shadow-xl p-8 max-w-xs w-full text-center">
+                <div @click.away="showCancelModal = false" class="bg-white rounded-xl shadow-xl p-8 max-w-xs w-full text-center">
                     <h3 class="text-lg font-bold mb-4">¿Cancelar esta compra?</h3>
                     <p class="mb-6 text-gray-600">Esta acción no se puede deshacer.</p>
                     <form method="POST" :action="'/orders/' + order.id + '/cancel'">

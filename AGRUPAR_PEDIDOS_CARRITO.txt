@@ -1,0 +1,31 @@
+AGRUPAR PEDIDOS DEL CARRITO EN UN SOLO PEDIDO (MODELO PROFESIONAL)
+
+1. MODELO Y BASE DE DATOS
+- Crear tabla 'orders' (pedido principal):
+  id, user_id, status, payment_method, total, notes, created_at, updated_at
+- Crear tabla 'order_items' (productos dentro del pedido):
+  id, order_id, product_id, seller_id, quantity, price, subtotal
+
+2. LÓGICA AL CONFIRMAR CARRITO
+- Al finalizar compra, crear UN registro en 'orders' con los datos generales.
+- Por cada producto en el carrito, crear un registro en 'order_items' vinculado al pedido.
+
+3. VISTAS Y DETALLE
+- Al ver el detalle de un pedido, mostrar todos los productos asociados (order_items).
+- Mostrar cantidades, precios, subtotales y totales.
+
+4. BENEFICIOS
+- El usuario ve una sola compra con todos los productos.
+- El vendedor puede ver qué productos le compraron en cada pedido.
+- El historial es más claro y profesional.
+
+5. PASOS SUGERIDOS
+- Crear migraciones para 'orders' y 'order_items'.
+- Actualizar el componente Livewire/cart para crear el pedido agrupado.
+- Actualizar las vistas de "Mis compras" y detalle para mostrar los productos del pedido.
+
+6. OPCIONAL
+- Agregar relación con múltiples vendedores por pedido (si aplica).
+- Notificaciones agrupadas por pedido.
+
+¡Este es el estándar en e-commerce y marketplaces profesionales! 
