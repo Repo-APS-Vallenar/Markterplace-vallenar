@@ -50,7 +50,35 @@
         console.log("ROL del usuario: '{{ Auth::user()->role }}'");
         console.log("URL actual: '{{ url()->current() }}'");
     </script>
-    
+    <script>
+    window.openModal = function(url) {
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'text/html'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('dynamic-modal-content').innerHTML = html;
+            document.getElementById('dynamic-modal').classList.remove('hidden');
+        })
+        .catch(() => alert('Error al cargar el modal'));
+    }
+    // Cerrar modal al hacer click fuera del contenido
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('dynamic-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    document.getElementById('dynamic-modal-content').innerHTML = '';
+                }
+            });
+        }
+    });
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 
 

@@ -9,21 +9,33 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'seller' && auth()->user()->role !== 'admin') {
+                abort(403, 'No autorizado');
+            }
+            return $next($request);
+        });
+    }
 
     public function index()
     {
-        if (Auth::user()->role === 'admin' || Auth::user()->role === 'seller') {
+        if (Auth::user()->role === 'admin') {
             $products = Product::all();
         } else {
-            $products = Product::where('seller_id', Auth::id())->get();
+            $products = Product::where('user_id', Auth::id())->get();
         }
         return view('seller.products.index', compact('products'));
     }
 
     // Mostrar el formulario para crear un nuevo producto
-    public function create()
+    public function create(Request $request)
     {
-        return view('seller.products.modals.create-modal');
+        if ($request->ajax()) {
+            return view('seller.products.modals.create-modal');
+        }
+        return redirect()->route('seller.products.index');
     }
 
     // Guardar un nuevo producto
@@ -34,47 +46,63 @@ class ProductController extends Controller
             'description' => 'required',
             'price' => 'required|numeric',
             'category_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        // Crear el producto y asociarlo con el vendedor
         $product = new Product();
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
-        $product->seller_id = Auth::id(); // Usar el ID del vendedor autenticado
+        $product->user_id = Auth::id();
         $product->category_id = $request->category_id;
-        $product->save();
 
-        return redirect()->route('buyer.products.by_user', ['userId' => Auth::id()]);
-    }
-
-    public function edit(Product $product)
-    {
-        if ($product->seller_id !== Auth::id()) {
-            return response()->json(['error' => 'No autorizado'], 403);
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $product->image = $imagePath;
         }
 
-        return response()->json($product);
+        $product->save();
+
+        return redirect()->route('buyer.products.index');
+    }
+
+    public function edit(Product $product, Request $request)
+    {
+        if ($product->user_id !== Auth::id()) {
+            abort(403, 'No autorizado');
+        }
+
+        if ($request->ajax()) {
+            return view('seller.products.modals.edit-modal', compact('product'));
+        }
+
+        return redirect()->route('seller.products.index');
     }
 
     // Actualizar un producto
     public function update(Request $request, Product $product)
     {
-        //$this->authorize('update', $product); // opcional según roles
-
         $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        $product->update([
+        $data = [
             'name' => $request->name,
             'price' => $request->price,
             'description' => $request->description,
             'category_id' => $request->category_id,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        $product->update($data);
 
         return redirect()->route('seller.products.index')->with('success', 'Producto actualizado correctamente.');
     }
@@ -83,7 +111,7 @@ class ProductController extends Controller
     // Eliminar un producto
     public function destroy(Product $product)
     {
-        if ($product->seller_id !== Auth::id()) {
+        if ($product->user_id !== Auth::id()) {
             return redirect()->route('seller.products.index');
         }
 
@@ -91,8 +119,27 @@ class ProductController extends Controller
         return redirect()->route('seller.products.index');
     }
 
-    public function show(Product $product)
+    public function show(Product $product, Request $request)
     {
-        return response()->json($product);
+        if ($product->user_id !== Auth::id()) {
+            abort(403, 'No autorizado');
+        }
+
+        if ($request->ajax()) {
+            return view('seller.products.modals.show-modal', compact('product'));
+        }
+
+        return redirect()->route('seller.products.index');
+    }
+
+    public function deleteModal(Product $product, Request $request)
+    {
+        if ($product->user_id !== Auth::id()) {
+            abort(403, 'No autorizado');
+        }
+        if ($request->ajax()) {
+            return view('seller.products.modals.delete-modal', compact('product'));
+        }
+        return redirect()->route('seller.products.index');
     }
 }

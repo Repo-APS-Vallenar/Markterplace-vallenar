@@ -43,7 +43,7 @@ Route::middleware('auth')->prefix('orders')->name('orders.')->group(function () 
 
 // Panel administrador
 Route::prefix('admin')
-    ->middleware(['auth', 'checkrole:admin'])
+    ->middleware(['auth'])
     ->as('admin.')
     ->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
@@ -55,6 +55,7 @@ Route::prefix('admin')
         Route::get('/users/{user}/edit', [AdminController::class, 'showUser'])->name('users.edit');
         Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+        Route::get('/users/{user}/delete-confirm', [AdminController::class, 'deleteConfirm'])->name('users.delete-confirm');
 
         // Supervisión de vendedores
         Route::get('/supervise-sellers', [AdminUserController::class, 'index'])->name('supervise_sellers');
@@ -71,18 +72,24 @@ Route::prefix('seller')
         Route::get('/', [SellerController::class, 'index'])->name('index');
 
         // Gestión de productos del vendedor
+        Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
+        Route::get('/products/prueba', function() {
+            return 'Funciona!';
+        });
         Route::get('/products', [SellerProductController::class, 'index'])->name('products.index');
         Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
         Route::get('/products/{product}', [SellerProductController::class, 'show'])->name('products.show');
         Route::get('/products/{product}/edit', [SellerProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{product}', [SellerProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [SellerProductController::class, 'destroy'])->name('products.destroy');
+        Route::get('/products/{product}/delete-modal', [App\Http\Controllers\Seller\ProductController::class, 'deleteModal'])->name('products.delete-modal');
 
         // Pedidos asociados a productos del vendedor
         Route::get('/orders', [SellerController::class, 'orders'])->name('orders.index');
+        Route::get('/orders/{order}/modal', [App\Http\Controllers\Seller\SellerController::class, 'showOrderModal'])->name('orders.show-modal');
     });
 Route::get('/products/{userId}', [BuyerProductController::class, 'showProducts'])
-    ->middleware(['auth', 'checkrole:buyer,admin'])
+    ->middleware(['auth'])
     ->name('buyer.products.by_user');
 
 // Panel comprador
@@ -121,4 +128,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::put('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
+});
+
+// Ruta de prueba fuera de grupo
+Route::get('/prueba-fuera', function() {
+    return 'Ruta fuera de grupo';
 });

@@ -9,6 +9,15 @@ use App\Http\Controllers\Controller;
 
 class SellerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (auth()->check() && auth()->user()->role !== 'seller' && auth()->user()->role !== 'admin') {
+                abort(403, 'No autorizado');
+            }
+            return $next($request);
+        });
+    }
 
     // Mostrar todos los productos del vendedor
     public function index()
@@ -91,5 +100,23 @@ class SellerController extends Controller
         $product->delete();
 
         return redirect()->route('seller.products.index')->with('success', 'Producto eliminado exitosamente.');
+    }
+
+    // Mostrar los pedidos recibidos por el vendedor
+    public function orders()
+    {
+        // Obtener los IDs de los productos del vendedor autenticado
+        $productIds = \App\Models\Product::where('user_id', Auth::id())->pluck('id');
+
+        // Obtener los pedidos de esos productos
+        $orders = \App\Models\Order::whereIn('product_id', $productIds)->with('product', 'user')->get();
+
+        return view('seller.orders.index', compact('orders'));
+    }
+
+    public function showOrderModal($id)
+    {
+        $order = \App\Models\Order::with('product', 'user')->findOrFail($id);
+        return view('seller.orders.modals.show-modal', compact('order'));
     }
 }

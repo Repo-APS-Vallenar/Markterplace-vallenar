@@ -38,7 +38,7 @@
                             <x-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.*')">
                                 Gestionar Productos
                             </x-nav-link>
-                            <x-nav-link :href="route('seller.orders')" :active="request()->routeIs('seller.orders')">
+                            <x-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.*')">
                                 Ver Pedidos Recibidos
                             </x-nav-link>
                             <x-nav-link :href="route('buyer.products.index')" :active="request()->routeIs('buyer.products.index')">

@@ -20,8 +20,8 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (Auth::check() && Auth::user()->role !== 'admin') {
-                abort(403, 'Unauthorized');
+            if (auth()->check() && auth()->user()->role !== 'admin') {
+                abort(403, 'No autorizado');
             }
             return $next($request);
         });
@@ -40,9 +40,12 @@ class AdminController extends Controller
     }
 
     // Crear nuevo usuario
-    public function createUser()
+    public function createUser(Request $request)
     {
-        return view('admin.users.create');
+        if ($request->ajax()) {
+            return view('admin.users.create');
+        }
+        return view('admin.users.index');
     }
 
     // Guardar nuevo usuario
@@ -66,9 +69,52 @@ class AdminController extends Controller
     }
 
     // Ver un usuario específico
-    public function showUser($id)
+    public function showUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        return view('admin.users.show', compact('user'));
+        if ($request->ajax()) {
+            return view('admin.users.edit', compact('user'));
+        }
+        return view('admin.users.index');
+    }
+
+    public function deleteConfirm(Request $request, User $user)
+    {
+        if ($request->ajax()) {
+            return view('admin.users.delete-confirm', compact('user'));
+        }
+        return view('admin.users.index');
+    }
+
+    // Actualizar usuario
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+            'role' => 'required|in:admin,seller,buyer',
+        ]);
+
+        $userData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+        ];
+
+        if ($request->filled('password')) {
+            $userData['password'] = bcrypt($request->password);
+        }
+
+        $user->update($userData);
+
+        return redirect()->route('admin.users.index')->with('success', 'Usuario actualizado correctamente');
+    }
+
+    // Eliminar usuario
+    public function destroyUser(User $user)
+    {
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado correctamente');
     }
 }

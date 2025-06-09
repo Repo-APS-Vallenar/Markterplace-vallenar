@@ -14,11 +14,20 @@ class OrderController extends Controller
     // 1. Listado de pedidos (filtrado según rol)
     public function index()
     {
-        $orders = Order::with(['product', 'user'])->latest()->get();
+        $user = auth()->user();
 
-        $orders = $orders->filter(function ($order) {
-            return \Gate::allows('view', $order);
-        })->values();
+        if ($user->isAdmin()) {
+            // Admin ve todos los pedidos
+            $orders = Order::with(['product', 'user'])->latest()->get();
+        } elseif ($user->isSeller()) {
+            // Vendedor ve solo pedidos de sus productos
+            $orders = Order::whereHas('product', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })->with(['product', 'user'])->latest()->get();
+        } else {
+            // Comprador ve solo sus pedidos
+            $orders = Order::where('user_id', $user->id)->with(['product', 'user'])->latest()->get();
+        }
 
         $ordersForJson = $orders->map(function($order) {
             return [

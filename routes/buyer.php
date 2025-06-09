@@ -1,4 +1,9 @@
 <?php
+// Todas las rutas comentadas para evitar conflicto con web.php
+// Route::middleware(['auth', 'checkrole:buyer,admin'])
+//     ->group(function () {
+//         // ...
+//     });
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Buyer\BuyerController;
