@@ -35,7 +35,7 @@ class AdminController extends Controller
     // Listar todos los usuarios
     public function listUsers()
     {
-        $users = User::all();
+        $users = User::paginate(10);
         return view('admin.users.index', compact('users'));
     }
 
@@ -72,10 +72,7 @@ class AdminController extends Controller
     public function showUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        if ($request->ajax()) {
-            return view('admin.users.edit', compact('user'));
-        }
-        return view('admin.users.index');
+        return view('admin.users.edit', compact('user'));
     }
 
     public function deleteConfirm(Request $request, User $user)
@@ -116,5 +113,10 @@ class AdminController extends Controller
     {
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado correctamente');
+    }
+
+    public function editModal(User $user)
+    {
+        return view('admin.users.partials.edit-modal', compact('user'));
     }
 }

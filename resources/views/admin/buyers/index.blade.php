@@ -13,12 +13,7 @@
           placeholder="Nombre o email...">
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-        <select name="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
-          <option value="">Todos</option>
-          <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Activo</option>
-          <option value="suspended" {{ request('status') == 'suspended' ? 'selected' : '' }}>Suspendido</option>
-        </select>
+        <!-- Estado eliminado -->
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha desde</label>
@@ -31,12 +26,11 @@
           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
       </div>
       <div class="md:col-span-4 flex justify-end">
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Filtrar
-        </button>
-        <a href="{{ route('admin.buyers.index') }}" class="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          Limpiar
-        </a>
+        <div class="mt-6 flex gap-2">
+            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 font-semibold transition">Filtrar</button>
+            <a href="{{ route('admin.buyers.index') }}"
+                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 font-semibold transition">Limpiar</a>
+        </div>
       </div>
     </form>
   </div>
@@ -48,7 +42,6 @@
         <tr>
           <th class="px-4 py-2 font-semibold text-gray-700">Nombre</th>
           <th class="px-4 py-2 font-semibold text-gray-700">Email</th>
-          <th class="px-4 py-2 font-semibold text-gray-700">Estado</th>
           <th class="px-4 py-2 font-semibold text-gray-700">Pedidos</th>
           <th class="px-4 py-2 font-semibold text-gray-700">Registro</th>
           <th class="px-4 py-2 font-semibold text-gray-700 text-center">Acciones</th>
@@ -59,32 +52,29 @@
         <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }} hover:bg-blue-50 transition">
           <td class="px-4 py-2">{{ $b->name }}</td>
           <td class="px-4 py-2">{{ $b->email }}</td>
-          <td class="px-4 py-2">
-            <span class="inline-block px-2 py-1 rounded text-xs font-semibold
-              {{ $b->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-              {{ $b->is_active ? 'Activo' : 'Suspendido' }}
-            </span>
-          </td>
           <td class="px-4 py-2 text-center">{{ $b->orders->count() }}</td>
           <td class="px-4 py-2">{{ $b->created_at->format('d/m/Y') }}</td>
-          <td class="px-4 py-2 text-center space-x-1">
-            <button type="button"
-              class="show-buyer-button inline-flex items-center gap-1 px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 transition"
-              data-buyer='@json($buyersForJson[$i])'>
-              <i class="fas fa-eye"></i> Ver
-            </button>
-            <a href="{{ route('admin.users.edit', $b) }}"
-              class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition">
-              <i class="fas fa-edit"></i> Editar
-            </a>
-            <form action="{{ route('admin.users.destroy', $b) }}" method="POST" class="inline">
-              @csrf @method('DELETE')
-              <button type="submit"
-                class="inline-flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                onclick="return confirm('¿Eliminar este comprador?')">
-                <i class="fas fa-trash"></i> Borrar
-              </button>
-            </form>
+          <td class="px-4 py-2 text-center">
+            <div class="inline-flex gap-1">
+                <button type="button"
+                    class="show-buyer-button flex items-center justify-center w-10 h-10 bg-teal-500 text-white rounded hover:bg-teal-600 transition"
+                    data-buyer='@json($buyersForJson[$i])'>
+                    <i class="fas fa-eye text-lg"></i>
+                </button>
+                <button type="button"
+                    class="flex items-center justify-center w-10 h-10 bg-yellow-400 text-white rounded hover:bg-yellow-500 transition"
+                    onclick="window.openModal('{{ route('admin.users.edit-modal', $b) }}')">
+                    <i class="fas fa-edit text-lg"></i>
+                </button>
+                <form action="{{ route('admin.users.destroy', $b) }}" method="POST" class="inline">
+                    @csrf @method('DELETE')
+                    <button type="submit"
+                        class="flex items-center justify-center w-10 h-10 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                        onclick="return confirm('¿Eliminar este comprador?')">
+                        <i class="fas fa-trash text-lg"></i>
+                    </button>
+                </form>
+            </div>
           </td>
         </tr>
         @empty

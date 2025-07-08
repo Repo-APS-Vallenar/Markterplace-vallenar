@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Order;
 use App\Models\Category;
+use App\Models\OrderItem;
 
 class Product extends Model
 {
@@ -43,5 +44,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    // Relación con el modelo Order
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

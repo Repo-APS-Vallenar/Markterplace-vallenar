@@ -13,7 +13,7 @@ use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\Admin\AdminUserController;
 
 // Ruta de bienvenida
-Route::view('/', 'welcome')->name('welcome');
+Route::view('/', 'auth.login')->name('login');
 
 // Autenticación (Laravel Breeze / Fortify)
 require __DIR__ . '/auth.php';
@@ -56,6 +56,7 @@ Route::prefix('admin')
         Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
         Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
         Route::get('/users/{user}/delete-confirm', [AdminController::class, 'deleteConfirm'])->name('users.delete-confirm');
+        Route::get('/users/{user}/edit-modal', [AdminController::class, 'editModal'])->name('users.edit-modal');
 
         // Supervisión de vendedores
         Route::get('/supervise-sellers', [AdminUserController::class, 'index'])->name('supervise_sellers');

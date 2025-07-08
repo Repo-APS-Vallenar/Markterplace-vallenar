@@ -13,7 +13,9 @@ class AdminUserController extends Controller
     {
         $query = User::where('role', 'seller')
             ->with(['products' => function($q) {
-                $q->with('orders');
+                $q->with(['orderItems' => function($q) {
+                    $q->with('order');
+                }]);
             }]);
 
         // Filtro de búsqueda
@@ -42,7 +44,7 @@ class AdminUserController extends Controller
         $users->getCollection()->transform(function($u) {
             $u->products_count = $u->products->count();
             $u->orders_count = $u->products->reduce(function($carry, $product) {
-                return $carry + $product->orders->count();
+                return $carry + $product->orderItems->count();
             }, 0);
             return $u;
         });

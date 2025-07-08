@@ -83,14 +83,21 @@
                 'Accept': 'text/html'
             }
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar el modal: ' + response.status + ' ' + response.statusText);
+            }
+            return response.text();
+        })
         .then(html => {
             const modalContent = document.getElementById('dynamic-modal-content');
             modalContent.innerHTML = '';
             modalContent.innerHTML = html;
             document.getElementById('dynamic-modal').classList.remove('hidden');
         })
-        .catch(() => alert('Error al cargar el modal'));
+        .catch(error => {
+            alert(error.message);
+        });
     }
     document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('dynamic-modal');
@@ -101,6 +108,19 @@
             }
         });
     });
+    // Script global para cerrar cualquier modal
+    window.closeModal = function() {
+        // Oculta el modal AJAX reutilizable
+        const dynModal = document.getElementById('dynamic-modal');
+        if (dynModal) {
+            dynModal.classList.add('hidden');
+            document.getElementById('dynamic-modal-content').innerHTML = '';
+        }
+        // Oculta cualquier otro modal con la clase de fondo
+        document.querySelectorAll('.fixed.inset-0.bg-gray-500').forEach(function(modal) {
+            modal.classList.add('hidden');
+        });
+    };
     </script>
 
     <!-- Script de modales de productos del vendedor -->
