@@ -1,15 +1,12 @@
 <?php
 
+// app/Models/User.php
+
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-use Illuminate\Support\Facades\Auth;
-
-// En App\Models\User.php
 
 class User extends Authenticatable
 {
@@ -50,18 +47,19 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function products()
+    public function products() // Productos creados por este usuario (vendedor)
     {
         return $this->hasMany(Product::class, 'user_id');
     }
 
-    public function orders()
+    public function orders() // Pedidos realizados por este usuario (comprador)
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'user_id'); // Explícitamente user_id para claridad
     }
 
-    public function seller()
+    // Un usuario (vendedor) recibe order items.
+    public function receivedOrderItems()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->hasMany(OrderItem::class, 'seller_id');
     }
 }

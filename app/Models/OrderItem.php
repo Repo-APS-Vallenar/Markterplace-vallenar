@@ -10,12 +10,12 @@ class OrderItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'order_id',
-        'product_id',
-        'seller_id',
-        'quantity',
-        'price',
-        'subtotal'
+        'order_id',    // <-- Asegúrate de que este esté
+        'product_id',  // <-- Asegúrate de que este esté
+        'seller_id',   // <-- Asegúrate de que este esté
+        'quantity',    // <-- Asegúrate de que este esté
+        'price',       // <-- Asegúrate de que este esté
+        'subtotal',    // <-- Asegúrate de que este esté
     ];
 
     // Relación con el pedido

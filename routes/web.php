@@ -73,21 +73,24 @@ Route::prefix('seller')
         Route::get('/', [SellerController::class, 'index'])->name('index');
 
         // Gestión de productos del vendedor
-        Route::get('/products/create', [App\Http\Controllers\Seller\ProductController::class, 'create'])->name('products.create');
-        Route::get('/products/prueba', function() {
-            return 'Funciona!';
-        });
+        Route::get('/products/create', [SellerProductController::class, 'create'])->name('products.create');
+        // Quita Route::get('/products/prueba', function () { return 'Funciona!'; }); si ya no lo usas.
         Route::get('/products', [SellerProductController::class, 'index'])->name('products.index');
         Route::post('/products', [SellerProductController::class, 'store'])->name('products.store');
         Route::get('/products/{product}', [SellerProductController::class, 'show'])->name('products.show');
         Route::get('/products/{product}/edit', [SellerProductController::class, 'edit'])->name('products.edit');
         Route::put('/products/{product}', [SellerProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [SellerProductController::class, 'destroy'])->name('products.destroy');
-        Route::get('/products/{product}/delete-modal', [App\Http\Controllers\Seller\ProductController::class, 'deleteModal'])->name('products.delete-modal');
+        Route::get('/products/{product}/delete-modal', [SellerProductController::class, 'deleteModal'])->name('products.delete-modal');
 
         // Pedidos asociados a productos del vendedor
         Route::get('/orders', [SellerController::class, 'orders'])->name('orders.index');
-        Route::get('/orders/{order}/modal', [App\Http\Controllers\Seller\SellerController::class, 'showOrderModal'])->name('orders.show-modal');
+
+        // Esta es la UNICA ruta para el modal de detalle del pedido del vendedor
+        Route::get('/orders/{id}/modal', [SellerController::class, 'showOrderModal'])->name('orders.showModal');
+
+        // Ruta para actualizar el estado del pedido
+        Route::put('/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])->name('orders.update-status');
     });
 Route::get('/products/{userId}', [BuyerProductController::class, 'showProducts'])
     ->middleware(['auth'])
@@ -132,6 +135,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // Ruta de prueba fuera de grupo
-Route::get('/prueba-fuera', function() {
+Route::get('/prueba-fuera', function () {
     return 'Ruta fuera de grupo';
 });

@@ -97,13 +97,12 @@ class Cart extends Component
             // 4. Recorrer los productos del carrito para crear los ITEMS del PEDIDO
             foreach ($this->cart as $productId => $item) {
                 OrderItem::create([
-                    'order_id' => $order->id, // Asocia al pedido recién creado
-                    'product_id' => $productId, // Este es el ID del producto
-                    'seller_id' => $item['seller_id'] ?? null, // Asegúrate de que seller_id esté en tu carrito
+                    'order_id' => $order->id, // <-- Asegúrate que $order->id esté disponible aquí
+                    'product_id' => $productId,
+                    'seller_id' => $item['seller_id'], // <-- Asegúrate que seller_id esté disponible aquí
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'], // El precio unitario del producto en el momento de la compra
+                    'price' => $item['price'],
                     'subtotal' => ($item['price'] ?? 0) * ($item['quantity'] ?? 0),
-                    // 'created_at' y 'updated_at' se manejan automáticamente
                 ]);
             }
 

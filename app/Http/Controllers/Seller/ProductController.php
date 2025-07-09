@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            if (auth()->check() && auth()->user()->role !== 'seller' && auth()->user()->role !== 'admin') {
+            if (Auth::check() && Auth::user()->role !== 'seller' && Auth::user()->role !== 'admin') {
                 abort(403, 'No autorizado');
             }
             return $next($request);
@@ -41,19 +41,22 @@ class ProductController extends Controller
     // Guardar un nuevo producto
     public function store(Request $request)
     {
+
+        // dd($request->all()); // ¡Elimina o comenta esta línea!
+
         $request->validate([
             'name' => 'required',
             'description' => 'required',
             'price' => 'required|numeric',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10048',
         ]);
 
         $product = new Product();
         $product->name = $request->name;
         $product->description = $request->description;
         $product->price = $request->price;
-        $product->user_id = Auth::id();
+        $product->user_id = Auth::id(); // Asegúrate que Auth::id() devuelve el ID del seller logueado
         $product->category_id = $request->category_id;
 
         if ($request->hasFile('image')) {
@@ -61,11 +64,11 @@ class ProductController extends Controller
             $product->image = $imagePath;
         }
 
-        $product->save();
+        $product->save(); // Esta línea es clave para guardar el producto en la BD
 
-        return redirect()->route('buyer.products.index');
+        // La redirección está correcta ahora:
+        return redirect()->route('seller.products.index')->with('success', 'Producto creado correctamente.');
     }
-
     public function edit(Product $product, Request $request)
     {
         if ($product->user_id !== Auth::id()) {
