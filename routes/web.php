@@ -11,6 +11,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\MercadoPagoController;
 
 // Ruta de bienvenida
 Route::view('/', 'auth.login')->name('login');
@@ -138,3 +139,16 @@ Route::middleware('auth')->group(function () {
 Route::get('/prueba-fuera', function () {
     return 'Ruta fuera de grupo';
 });
+
+// Rutas de MercadoPago (URLs de retorno después del pago)
+Route::get('/mercadopago/success', [MercadoPagoController::class, 'paymentSuccess'])->name('mercadopago.success');
+Route::get('/mercadopago/pending', [MercadoPagoController::class, 'paymentPending'])->name('mercadopago.pending');
+Route::get('/mercadopago/failure', [MercadoPagoController::class, 'paymentFailure'])->name('mercadopago.failure');
+
+// Webhook sin protección CSRF (MercadoPago no puede enviar tokens CSRF)
+Route::post('/mercadopago/webhook', [MercadoPagoController::class, 'handleWebhook'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->name('mercadopago.webhook');
+
+// Ruta para iniciar el pago con Mercado Pago (si se necesita)
+Route::post('/checkout/mercadopago/init', [MercadoPagoController::class, 'initPayment'])->name('mercadopago.init');

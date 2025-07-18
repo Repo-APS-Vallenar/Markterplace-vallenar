@@ -223,31 +223,3 @@
                 </form>
             </div>
         </div>
-    @endif
-
-    {{-- JavaScript para manejar la redirección a MercadoPago --}}
-    <script>
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('redirect-to-mercadopago', (event) => {
-                console.log('🎯 Evento recibido para redirección:', event);
-                
-                // En Livewire 3, el evento puede venir en diferentes formatos
-                let url = event.url || event[0]?.url || event[0] || event;
-                
-                console.log('🔗 URL extraída:', url);
-                
-                if (url && url !== 'undefined' && url !== '') {
-                    console.log('🚀 Redirigiendo a MercadoPago:', url);
-                    
-                    // Redirección inmediata sin alerta previa
-                    
-                    // Redirección inmediata
-                    window.location.href = url;
-                } else {
-                    console.error('❌ URL de MercadoPago no válida:', url);
-                    alert('Error: No se pudo obtener la URL de MercadoPago');
-                }
-            });
-        });
-    </script>
-</div>

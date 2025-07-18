@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -123,4 +122,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | MercadoPago Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the access token and environment for MercadoPago.
+    | Set the environment to 'production' when you are ready to go live.
+    |
+    */
+    'mercadopago_public_key' => 'TEST-6b3c2c85-0b4a-4b8e-ab7c-3cf603de8b2e',
+    'mercadopago_access_token' => 'TEST-8138401743011005-071711-361c8ba062b4c5a5bac5df8ccd9c84f2-512145211',
+    'mercadopago_env' => 'production', // Cambia a 'production' si estás en producción
 ];

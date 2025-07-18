@@ -239,7 +239,27 @@
                 if (url && url !== 'undefined' && url !== '') {
                     console.log('🚀 Redirigiendo a MercadoPago:', url);
                     
-                    // Redirección inmediata sin alerta previa
+                    // Mostrar mensaje visual antes de redirigir
+                    alert('Redirigiendo a MercadoPago...');
+                    
+                    // Redirección inmediata
+                    window.location.href = url;
+    {{-- JavaScript para manejar la redirección a MercadoPago --}}
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('redirect-to-mercadopago', (event) => {
+                console.log('🎯 Evento recibido para redirección:', event);
+                
+                // En Livewire 3, el evento puede venir en diferentes formatos
+                let url = event.url || event[0]?.url || event[0] || event;
+                
+                console.log('🔗 URL extraída:', url);
+                
+                if (url && url !== 'undefined' && url !== '') {
+                    console.log('🚀 Redirigiendo a MercadoPago:', url);
+                    
+                    // Mostrar mensaje visual antes de redirigir
+                    alert('Redirigiendo a MercadoPago...');
                     
                     // Redirección inmediata
                     window.location.href = url;
